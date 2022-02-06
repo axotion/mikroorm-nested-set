@@ -1,6 +1,3 @@
 node_modules/*
 dist/*
 .idea/
-
-**/src/*.js
-src/tsconfig.tsbuildinfo
