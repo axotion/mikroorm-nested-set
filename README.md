@@ -17,7 +17,7 @@ At first, you have to create a new entity-type class and extend NestedSetSubject
 
 ```typescript
 
-import {NestedSetSubjectAbstract} from "../../src";
+import {NestedSetSubjectAbstract} from "mikroorm-nested-set";
 import {Cascade, Collection, Entity, ManyToOne, OneToMany, PrimaryKey, Property} from "@mikro-orm/core";
 
 @Entity()
@@ -59,7 +59,7 @@ export class CategoryFake extends NestedSetSubjectAbstract<CategoryFake>{
 
 After that, you have to create a repository for your new entity. **(It's required for extra tree methods)**
 ```typescript
-import {NestedSetSubjectRepository} from "../../src/repository";
+import {NestedSetSubjectRepository} from "mikroorm-nested-set";
 import {CategoryFake} from "./category.fake";
 
 export class CategoryFakeRepository extends NestedSetSubjectRepository<CategoryFake> {}
