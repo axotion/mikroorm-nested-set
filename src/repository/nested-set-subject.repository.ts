@@ -32,7 +32,7 @@ export abstract class NestedSetSubjectRepository<T extends NestedSetSubjectAbstr
   }
 
   async findWritableTree() : Promise<NestedSetSubjectAbstract<T>> {
-    return await this.findOne({ parent: null } as NonNullable<Query<T>>)
+    return await this.findOne({ parent: null } as unknown as NonNullable<Query<T>>)
   }
 
   protected async findAndBuildReadableTree(options: {
