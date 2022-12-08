@@ -70,19 +70,20 @@ export abstract class NestedSetSubjectRepository<T extends NestedSetSubjectAbstr
 
     if(options.relations) {
       for(const relation of options.relations) {
-        preparedQuery.leftJoinAndSelect(relation.relationName, relation.alias)
+        preparedQuery.joinAndSelect(relation.relationName, relation.alias)
       }
     }
       
 
     const subjects = (await preparedQuery.execute()).map(subject => this.map(subject))
+    subjects.forEach(subject => subject.children = [])
 
     for(const subject of subjects) {
 
       const children = subjects.filter(innerSubject => innerSubject?.parent?.getIdentifier() === subject.getIdentifier())
 
       if(children && children.length >=1) {
-        subject.children.add(...children)
+        subject.children.push(...children)
       }
     }
 
