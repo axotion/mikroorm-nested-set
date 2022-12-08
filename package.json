@@ -1,6 +1,6 @@
 {
   "name": "mikroorm-nested-set",
-  "version": "1.0.7",
+  "version": "1.0.9",
   "types": "src/index.d.ts",
   "description": "Package for MikroORM nested set feature",
   "main": "src/index.js",

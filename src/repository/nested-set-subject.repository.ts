@@ -1,8 +1,6 @@
 import { EntityRepository } from "@mikro-orm/mysql";
 import { NestedSetSubjectAbstract } from "../model/nested-set-subject.abstract";
 import { Query } from "@mikro-orm/core/typings";
-import { randomUUID } from "crypto";
-import { CurrentLeftRightNode } from "./navigator/current-left-right-node.navigator";
 import {SqlEntityManager} from "@mikro-orm/knex/SqlEntityManager";
 import {EntityName} from "@mikro-orm/core";
 import {NestedSetNodeOperator} from "../operator";
@@ -36,8 +34,12 @@ export abstract class NestedSetSubjectRepository<T extends NestedSetSubjectAbstr
   }
 
   protected async findAndBuildReadableTree(options: {
-    //TODO: provide ability to pass custom query
-    depth? : number
+    extraQuery?: Record<string, any>
+    depth? : number,
+    relations?: {
+      relationName: string, // 'b.tags'
+      alias: string // 't'
+    }[]
   }) : Promise<NestedSetSubjectAbstract<T>> {
     const rootsQuery = this.createQueryBuilder('root')
       .where({
@@ -52,12 +54,19 @@ export abstract class NestedSetSubjectRepository<T extends NestedSetSubjectAbstr
 
     const root = rootResult[0]
 
-    const query = {
+    let query = {
       left: {
         $gte: root.left
       },
       right: {
         $lte: root.right
+      }
+    }
+
+    if(options.extraQuery) {
+      query = {
+        ...query,
+        ...options.extraQuery
       }
     }
 
@@ -67,7 +76,16 @@ export abstract class NestedSetSubjectRepository<T extends NestedSetSubjectAbstr
       }
     }
 
-    const subjects = (await this.createQueryBuilder('subject').where(query).execute()).map(subject => this.map(subject))
+    const preparedQuery = this.createQueryBuilder('subject').where(query)
+
+    if(options.relations) {
+      for(const relation of options.relations) {
+        preparedQuery.leftJoinAndSelect(relation.relationName, relation.alias)
+      }
+    }
+      
+
+    const subjects = (await preparedQuery.execute()).map(subject => this.map(subject))
 
     for(const subject of subjects) {
 
