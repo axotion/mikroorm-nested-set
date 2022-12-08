@@ -30,7 +30,7 @@ export abstract class NestedSetSubjectRepository<T extends NestedSetSubjectAbstr
       relationName: string, // 'b.tags'
       alias: string // 't'
     }[]
-  }) : Promise<NestedSetSubjectAbstract<T>> {
+  } = {}) : Promise<NestedSetSubjectAbstract<T>> {
     const rootsQuery = this.createQueryBuilder('root')
       .where({
         parent: null
