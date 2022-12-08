@@ -66,7 +66,7 @@ export abstract class NestedSetSubjectRepository<T extends NestedSetSubjectAbstr
       }
     }
 
-    const preparedQuery = this.createQueryBuilder('subject').where(query)
+    const preparedQuery = this.createQueryBuilder('subject').select('*').where(query)
 
     if(options.relations) {
       for(const relation of options.relations) {
