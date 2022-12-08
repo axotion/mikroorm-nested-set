@@ -14,16 +14,6 @@ export abstract class NestedSetSubjectRepository<T extends NestedSetSubjectAbstr
     this.nestedSetNodeOperator = new NestedSetNodeOperator<T>()
   }
 
-  async findReadableTreeWithDepth(depth: number) : Promise<NestedSetSubjectAbstract<Readonly<T>>> {
-    return this.findAndBuildReadableTree({
-      depth: depth
-    })
-  }
-
-  async findReadableTree() : Promise<NestedSetSubjectAbstract<Readonly<T>>> {
-    return this.findAndBuildReadableTree({})
-  }
-
   async persistAndFlushTree(subject: NestedSetSubjectAbstract<T>) : Promise<void> {
     this.nestedSetNodeOperator.recomputeTree(subject)
     return this.persistAndFlush(subject)
@@ -33,7 +23,7 @@ export abstract class NestedSetSubjectRepository<T extends NestedSetSubjectAbstr
     return await this.findOne({ parent: null } as unknown as NonNullable<Query<T>>)
   }
 
-  protected async findAndBuildReadableTree(options: {
+  async findReadableTree(options: {
     extraQuery?: Record<string, any>
     depth? : number,
     relations?: {
