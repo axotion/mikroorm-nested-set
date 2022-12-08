@@ -70,7 +70,7 @@ export abstract class NestedSetSubjectRepository<T extends NestedSetSubjectAbstr
 
     if(options.relations) {
       for(const relation of options.relations) {
-        preparedQuery.joinAndSelect(relation.relationName, relation.alias)
+        preparedQuery.leftJoinAndSelect(relation.relationName, relation.alias)
       }
     }
       
