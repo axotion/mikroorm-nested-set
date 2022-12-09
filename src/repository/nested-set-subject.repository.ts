@@ -81,13 +81,12 @@ export abstract class NestedSetSubjectRepository<T extends NestedSetSubjectAbstr
 
     for(const subject of subjects) {
 
-      // Filter duplicates on children level because of relations and joins
+      
       let children = subjects.filter(innerSubject => innerSubject?.parent?.getIdentifier() === subject.getIdentifier())
       
       if(children && children.length >=1) {
-
-
         const alreadyProcessedIds = []
+
         // Filter every child in children for duplicates
         children = children.filter(child => {
           if(alreadyProcessedIds.includes(child.getIdentifier())) {
@@ -97,12 +96,13 @@ export abstract class NestedSetSubjectRepository<T extends NestedSetSubjectAbstr
           return child
         })
 
+        // Filter duplicates on children level because of relations and joins
         children = children.filter(child => {
           return !alreadyProcessedChild.includes(child.getIdentifier())
         })
 
         subject.children.push(...children)
-        children.forEach(child => alreadyProcessedChild.push(child))
+        children.forEach(child => alreadyProcessedChild.push(child.getIdentifier()))
       }
     }
 
