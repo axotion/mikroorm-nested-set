@@ -77,13 +77,32 @@ export abstract class NestedSetSubjectRepository<T extends NestedSetSubjectAbstr
 
     const subjects = (await preparedQuery.execute()).map(subject => this.map(subject))
     subjects.forEach(subject => subject.children = [])
+    const alreadyProcessedChild = []
 
     for(const subject of subjects) {
 
-      const children = subjects.filter(innerSubject => innerSubject?.parent?.getIdentifier() === subject.getIdentifier())
-
+      // Filter duplicates on children level because of relations and joins
+      let children = subjects.filter(innerSubject => innerSubject?.parent?.getIdentifier() === subject.getIdentifier())
+      
       if(children && children.length >=1) {
+
+
+        const alreadyProcessedIds = []
+        // Filter every child in children for duplicates
+        children = children.filter(child => {
+          if(alreadyProcessedIds.includes(child.getIdentifier())) {
+            return false;
+          }
+          alreadyProcessedIds.push(child.getIdentifier())
+          return child
+        })
+
+        children = children.filter(child => {
+          return !alreadyProcessedChild.includes(child.getIdentifier())
+        })
+
         subject.children.push(...children)
+        children.forEach(child => alreadyProcessedChild.push(child))
       }
     }
 
