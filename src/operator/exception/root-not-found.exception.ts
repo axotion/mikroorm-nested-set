@@ -1,0 +1,1 @@
+export class RootNotFoundException extends Error {}

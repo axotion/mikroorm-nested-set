@@ -4,6 +4,7 @@ import { Query } from "@mikro-orm/core/typings";
 import {SqlEntityManager} from "@mikro-orm/knex/SqlEntityManager";
 import {EntityName} from "@mikro-orm/core";
 import {NestedSetNodeOperator} from "../operator";
+import { RootNotFoundException } from "../operator/exception/root-not-found.exception";
 
 export abstract class NestedSetSubjectRepository<T extends NestedSetSubjectAbstract<T>> extends EntityRepository<T>{
 
@@ -33,9 +34,10 @@ export abstract class NestedSetSubjectRepository<T extends NestedSetSubjectAbstr
     root?: NestedSetSubjectAbstract<T> | T
     } = {}) : Promise<NestedSetSubjectAbstract<T>> {
 
-    let root = options.root;
+    const root = options.root ? options.root : await this.findRoot()
+    
     if(!root) {
-      root = this.findRoot()
+      throw new RootNotFoundException(`Root of the tree was not found`)
     }
     
     let query = {
