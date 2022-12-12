@@ -30,20 +30,14 @@ export abstract class NestedSetSubjectRepository<T extends NestedSetSubjectAbstr
       relationName: string, // 'b.tags'
       alias: string // 't'
     }[]
-  } = {}) : Promise<NestedSetSubjectAbstract<T>> {
-    const rootsQuery = this.createQueryBuilder('root')
-      .where({
-        parent: null
-      })
+    root?: NestedSetSubjectAbstract<T> | T
+    } = {}) : Promise<NestedSetSubjectAbstract<T>> {
 
-    const rootResult = (await rootsQuery.execute()).map(subject => this.map(subject))
-
-    if(rootResult.length === 0) {
-      return null
+    let root = options.root;
+    if(!root) {
+      root = this.findRoot()
     }
-
-    const root = rootResult[0]
-
+    
     let query = {
       left: {
         $gte: root.left
@@ -109,6 +103,19 @@ export abstract class NestedSetSubjectRepository<T extends NestedSetSubjectAbstr
     return subjects[0] as NestedSetSubjectAbstract<T>
   }
 
+  private async findRoot(): Promise<NestedSetSubjectAbstract<T>> {
+    const rootsQuery = this.createQueryBuilder('root')
+      .where({
+        parent: null
+      })
 
+    const rootResult = (await rootsQuery.execute()).map(subject => this.map(subject))
+
+    if(rootResult.length === 0) {
+      return null
+    }
+
+    return rootResult[0] as NestedSetSubjectAbstract<T>;
+  }
 
 }
