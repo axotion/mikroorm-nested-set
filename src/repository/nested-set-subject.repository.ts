@@ -2,7 +2,7 @@ import { EntityRepository } from "@mikro-orm/mysql";
 import { NestedSetSubjectAbstract } from "../model/nested-set-subject.abstract";
 import { Query } from "@mikro-orm/core/typings";
 import {SqlEntityManager} from "@mikro-orm/knex/SqlEntityManager";
-import {EntityName} from "@mikro-orm/core";
+import {EntityName, QueryOrder} from "@mikro-orm/core";
 import {NestedSetNodeOperator} from "../operator";
 import { RootNotFoundException } from "../operator/exception/root-not-found.exception";
 
@@ -62,7 +62,7 @@ export abstract class NestedSetSubjectRepository<T extends NestedSetSubjectAbstr
       }
     }
 
-    const preparedQuery = this.createQueryBuilder('subject').select('*').where(query)
+    const preparedQuery = this.createQueryBuilder('subject').select('*').where(query).orderBy({ depth: 'ASC' });
 
     if(options.relations) {
       for(const relation of options.relations) {
