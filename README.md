@@ -53,6 +53,10 @@ export class CategoryFake extends NestedSetSubjectAbstract<CategoryFake>{
         return this.id
     }
 
+    getIdentifierName(): string {
+        return 'id'
+    }
+
 }
 
 ```
