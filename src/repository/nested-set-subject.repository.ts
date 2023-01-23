@@ -70,35 +70,58 @@ export abstract class NestedSetSubjectRepository<T extends NestedSetSubjectAbstr
       }
     }
       
+    const results = await preparedQuery.execute()
 
-    const subjects = (await preparedQuery.execute()).map(subject => this.map(subject))
-    subjects.forEach(subject => subject.children = [])
-    const alreadyProcessedChild = []
+    let subjects = []
+    const alreadyAddedSubjectIds = []
+
+    for(const result of results) {
+
+      if(alreadyAddedSubjectIds[result[root.getIdentifierName()]]) {
+        continue;
+      }
+
+      const subject = this.map(result)
+
+      //Override children and turn it into simple array
+      //@ts-ignore
+      subject.children = []
+
+      subjects.push(subject)
+      alreadyAddedSubjectIds.push(result[root.getIdentifierName()])
+    }
+
+   
+    const alreadyProcessedChildren = []
 
     for(const subject of subjects) {
 
-      
-      let children = subjects.filter(innerSubject => innerSubject?.parent?.getIdentifier() === subject.getIdentifier())
-      
-      if(children && children.length >=1) {
-        const alreadyProcessedIds = []
+      let children : any[] = []
+      const alreadyAddedChildrenOnCurrentSubject = []
 
-        // Filter every child in children for duplicates
-        children = children.filter(child => {
-          if(alreadyProcessedIds.includes(child.getIdentifier())) {
-            return false;
+      // Find all children for given subject
+      for(const potentialChild of subjects) {
+        if(subject?.getIdentifier() === potentialChild?.parent?.getIdentifier()) {
+
+          // Check if any of child is duplicate
+          if(alreadyAddedChildrenOnCurrentSubject.includes(potentialChild.getIdentifier())) {
+            continue;
           }
-          alreadyProcessedIds.push(child.getIdentifier())
-          return child
-        })
 
-        // Filter duplicates on children level because of relations and joins
-        children = children.filter(child => {
-          return !alreadyProcessedChild.includes(child.getIdentifier())
-        })
+          // Check if any of child is duplicate in global scope
+          if(alreadyProcessedChildren.includes(potentialChild.getIdentifier())) {
+            continue;
+          }
 
-        subject.children.push(...children)
-        children.forEach(child => alreadyProcessedChild.push(child.getIdentifier()))
+          children.push(potentialChild)
+          alreadyAddedChildrenOnCurrentSubject.push(potentialChild.getIdentifier())
+        }
+      }
+
+      subject.children.push(...children)
+
+      for(const child of children) {
+        alreadyProcessedChildren.push(child.getIdentifier())
       }
     }
 
