@@ -101,21 +101,24 @@ export abstract class NestedSetSubjectRepository<T extends NestedSetSubjectAbstr
 
       // Find all children for given subject
       for(const potentialChild of subjects) {
-        if(subject?.getIdentifier() === potentialChild?.parent?.getIdentifier()) {
-
-          // Check if any of child is duplicate
-          if(alreadyAddedChildrenOnCurrentSubject.includes(potentialChild.getIdentifier())) {
-            continue;
-          }
-
-          // Check if any of child is duplicate in global scope
-          if(alreadyProcessedChildren.includes(potentialChild.getIdentifier())) {
-            continue;
-          }
-
-          children.push(potentialChild)
-          alreadyAddedChildrenOnCurrentSubject.push(potentialChild.getIdentifier())
+        
+        if(subject?.getIdentifier() !== potentialChild?.parent?.getIdentifier()) {
+          continue;
         }
+
+        // Check if any of child is duplicate
+        if(alreadyAddedChildrenOnCurrentSubject.includes(potentialChild.getIdentifier())) {
+          continue;
+        }
+
+        // Check if any of child is duplicate in global scope
+        if(alreadyProcessedChildren.includes(potentialChild.getIdentifier())) {
+          continue;
+        }
+
+        children.push(potentialChild)
+        alreadyAddedChildrenOnCurrentSubject.push(potentialChild.getIdentifier())
+      
       }
 
       subject.children.push(...children)
