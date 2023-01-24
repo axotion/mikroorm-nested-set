@@ -73,22 +73,16 @@ export abstract class NestedSetSubjectRepository<T extends NestedSetSubjectAbstr
     const results = await preparedQuery.execute()
 
     let subjects = []
-    const alreadyAddedSubjectIds = []
 
     for(const result of results) {
 
-      if(alreadyAddedSubjectIds[result[root.getIdentifierName()]]) {
-        continue;
-      }
-
       const subject = this.map(result)
 
-      //Override children and turn it into simple array
+      //Override children and turn it into simple array. We want to keep it simple and low memory
       //@ts-ignore
       subject.children = []
 
       subjects.push(subject)
-      alreadyAddedSubjectIds.push(result[root.getIdentifierName()])
     }
 
    
@@ -102,6 +96,7 @@ export abstract class NestedSetSubjectRepository<T extends NestedSetSubjectAbstr
       // Find all children for given subject
       for(const potentialChild of subjects) {
         
+        // Check if potential child is really a child of current subject
         if(subject?.getIdentifier() !== potentialChild?.parent?.getIdentifier()) {
           continue;
         }
@@ -111,14 +106,13 @@ export abstract class NestedSetSubjectRepository<T extends NestedSetSubjectAbstr
           continue;
         }
 
-        // Check if any of child is duplicate in global scope
+        // Check if any of child is duplicate in global scope. Should't happen anymore
         if(alreadyProcessedChildren.includes(potentialChild.getIdentifier())) {
           continue;
         }
 
         children.push(potentialChild)
         alreadyAddedChildrenOnCurrentSubject.push(potentialChild.getIdentifier())
-      
       }
 
       subject.children.push(...children)

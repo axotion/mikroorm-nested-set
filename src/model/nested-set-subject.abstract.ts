@@ -31,8 +31,6 @@ export abstract class NestedSetSubjectAbstract<T> {
 
   abstract getIdentifier() : number | string
 
-  abstract getIdentifierName() : string
-
   getNextChild(computeSessionToken: string) : NestedSetSubjectAbstract<T> {
 
     if(this.computeSessionToken !== computeSessionToken) {
