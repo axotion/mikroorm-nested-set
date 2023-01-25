@@ -75,13 +75,7 @@ export abstract class NestedSetSubjectRepository<T extends NestedSetSubjectAbstr
     let subjects = []
 
     for(const result of results) {
-
       const subject = this.map(result)
-
-      //Override children and turn it into simple array. We want to keep it simple and low memory
-      //@ts-ignore
-      subject.children = []
-
       subjects.push(subject)
     }
 
@@ -91,6 +85,9 @@ export abstract class NestedSetSubjectRepository<T extends NestedSetSubjectAbstr
     for(const subject of subjects) {
 
       let children : any[] = []
+       //Override children and turn it into simple array. We want to keep it simple and low memory
+      //@ts-ignore
+      subject.children = []
       const alreadyAddedChildrenOnCurrentSubject = []
 
       // Find all children for given subject
