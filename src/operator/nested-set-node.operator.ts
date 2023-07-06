@@ -96,6 +96,10 @@ export class NestedSetNodeOperator<T extends NestedSetSubjectAbstract<T>> {
 
     while (true) {
 
+      if(!currentEntity) {
+        break;
+      }
+
       if(currentEntity.parent) {
         currentEntity.depth = currentEntity.parent.depth + 1
       }
